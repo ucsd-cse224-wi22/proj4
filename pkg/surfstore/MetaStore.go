@@ -21,7 +21,7 @@ func (m *MetaStore) UpdateFile(ctx context.Context, fileMetaData *FileMetaData) 
 }
 
 func (m *MetaStore) GetBlockStoreAddr(ctx context.Context, _ *emptypb.Empty) (*BlockStoreAddr, error) {
-	panic("todo")
+	return &BlockStoreAddr{Addr: m.BlockStoreAddr}, nil
 }
 
 // This line guarantees all method for MetaStore are implemented

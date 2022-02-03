@@ -5,6 +5,8 @@ import (
 	"time"
 
 	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type RPCClient struct {
@@ -15,7 +17,7 @@ type RPCClient struct {
 
 func (surfClient *RPCClient) GetBlock(blockHash string, blockStoreAddr string, block *Block) error {
 	// connect to the server
-	conn, err := grpc.Dial(blockStoreAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(blockStoreAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
@@ -53,7 +55,25 @@ func (surfClient *RPCClient) UpdateFile(fileMetaData *FileMetaData, latestVersio
 }
 
 func (surfClient *RPCClient) GetBlockStoreAddr(blockStoreAddr *string) error {
-	panic("todo")
+	// connect to the server
+	conn, err := grpc.Dial(surfClient.MetaStoreAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	c := NewMetaStoreClient(conn)
+
+	// perform the call
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	addr, err := c.GetBlockStoreAddr(ctx, &emptypb.Empty{})
+	if err != nil {
+		conn.Close()
+		return err
+	}
+	*blockStoreAddr = addr.Addr
+
+	// close the connection
+	return conn.Close()
 }
 
 // This line guarantees all method for RPCClient are implemented

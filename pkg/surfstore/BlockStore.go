@@ -10,7 +10,10 @@ type BlockStore struct {
 }
 
 func (bs *BlockStore) GetBlock(ctx context.Context, blockHash *BlockHash) (*Block, error) {
-	panic("todo")
+	return &Block{
+		BlockData: []byte("abcd"),
+		BlockSize: 4,
+	}, nil
 }
 
 func (bs *BlockStore) PutBlock(ctx context.Context, block *Block) (*Success, error) {
