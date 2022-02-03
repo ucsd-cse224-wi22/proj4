@@ -30,6 +30,10 @@ func ConcatPath(baseDir, fileDir string) string {
 	return baseDir + "/" + fileDir
 }
 
+/*
+	Reading and Writing Local Metadata File Related
+*/
+
 // NewFileMetaDataFromConfig returns a FileMetaData struct
 // associated with one line in the local metadata file.
 func NewFileMetaDataFromConfig(configString string) *FileMetaData {
@@ -89,6 +93,43 @@ func LoadMetaFromMetaFile(baseDir string) (fileMetaMap map[string]*FileMetaData,
 
 	return fileMetaMap, nil
 }
+
+// FileMetaDataToString converts a FileMetaData struct
+// to a string for writing back to local metadata file
+func FileMetaDataToString(fm *FileMetaData) (result string) {
+	result += fm.Filename + ","
+	result += strconv.Itoa(int(fm.Version)) + ","
+
+	for _, blockHash := range fm.BlockHashList {
+		result += blockHash + " "
+	}
+
+	result += "\n"
+	return
+}
+
+// WriteMetaFile writes the file meta map back to local metadata file
+func WriteMetaFile(fileMetas map[string]*FileMetaData, baseDir string) error {
+	outputMetaPath := ConcatPath(baseDir, DEFAULT_META_FILENAME)
+
+	outFD, err := os.Create(outputMetaPath)
+	if err != nil {
+		log.Fatal("Error During Meta Write Back")
+	}
+
+	for _, fileMeta := range fileMetas {
+		_, err := outFD.WriteString(FileMetaDataToString(fileMeta))
+		if err != nil {
+			log.Fatal("Error During Meta Write Back")
+		}
+	}
+
+	return nil
+}
+
+/*
+	Debugging Related
+*/
 
 // PrintMetaMap prints the contents of the metadata map.
 // You might find this function useful for debugging.

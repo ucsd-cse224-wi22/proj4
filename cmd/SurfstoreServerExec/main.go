@@ -39,11 +39,10 @@ func main() {
 
 	// Use tail arguments to hold BlockStore address
 	args := flag.Args()
-	if len(args) != 1 {
-		flag.Usage()
-		os.Exit(EX_USAGE)
+	blockStoreAddr := ""
+	if len(args) == 1 {
+		blockStoreAddr = args[0]
 	}
-	blockStoreAddr := args[0]
 
 	// Valid service type argument
 	if _, ok := SERVICE_TYPES[strings.ToLower(*service)]; !ok {
